@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/google/uuid"
 )
 
 const (
@@ -27,6 +28,12 @@ func (c *Config) Validate() (bool, error) {
 		return str == "https" || str == "http"
 	}
 
+	if configuration := c.Configuration; configuration != nil {
+		if result, err := configuration.validate(); err != nil {
+			return result, err
+		}
+	}
+
 	result, err := govalidator.ValidateStruct(c)
 	return result, appendInvalid(err)
 }
@@ -34,6 +41,46 @@ func (c *Config) Validate() (bool, error) {
 type Info struct {
 	Version     string `yaml:"version,omitempty"`
 	Description string `yaml:"description,omitempty"`
+}
+
+type Configuration struct {
+	NfInstanceId string `yaml:"nfInstanceId,omitempty" valid:"optional,uuidv4"`
+	Sbi          *Sbi   `yaml:"sbi,omitempty" valid:"required"`
+	NrfUri       string `yaml:"nrfUri,omitempty" valid:"url,required"`
+	GroupId      string `yaml:"groupId,omitempty" valid:"type(string),minstringlength(1)"`
+}
+
+func (c *Configuration) validate() (bool, error) {
+	if c.NfInstanceId == "" {
+		c.NfInstanceId = uuid.New().String()
+	}
+
+	if sbi := c.Sbi; sbi != nil {
+		if result, err := sbi.validate(); err != nil {
+			return result, err
+		}
+	}
+
+	result, err := govalidator.ValidateStruct(c)
+	return result, appendInvalid(err)
+}
+
+type Logger struct {
+	Enable       bool   `yaml:"enable" valid:"type(bool)"`
+	Level        string `yaml:"level" valid:"required,in(trace|debug|info|warn|error|fatal|panic)"`
+	ReportCaller bool   `yaml:"reportCaller" valid:"type(bool)"`
+}
+
+type Sbi struct {
+	Scheme       string `yaml:"scheme" valid:"scheme"`
+	RegisterIPv4 string `yaml:"registerIPv4,omitempty" valid:"host,required"` // IP that is registered at NRF.
+	BindingIPv4  string `yaml:"bindingIPv4,omitempty" valid:"host,required"`  // IP used to run the server in the node.
+	Port         int    `yaml:"port,omitempty" valid:"port,required"`
+}
+
+func (c *Sbi) validate() (bool, error) {
+	result, err := govalidator.ValidateStruct(c)
+	return result, appendInvalid(err)
 }
 
 func appendInvalid(err error) error {
@@ -47,4 +94,6 @@ func appendInvalid(err error) error {
 	for _, e := range es {
 		errs = append(errs, fmt.Errorf("invalid %w", e))
 	}
+
+	return error(errs)
 }

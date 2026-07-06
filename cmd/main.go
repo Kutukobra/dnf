@@ -10,9 +10,12 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/fre5gc/dnf/internal/logger"
+	"github.com/fre5gc/dnf/pkg/factory"
 	"github.com/free5gc/dnf/pkg/factory"
 	"github.com/free5gc/util/version"
 )
+
+var DNF 
 
 func main() {
 	defer func() {
@@ -61,6 +64,6 @@ func action(cliCtx *cli.Context) error {
 		sigCh <- nil
 		return err
 	}
-
+	factory.DnfConfig = cfg
 	return nil
 }
