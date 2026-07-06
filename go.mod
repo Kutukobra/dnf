@@ -3,7 +3,7 @@ module github.com/fre5gc/dnf
 go 1.26.2
 
 require (
-	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
+	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/bronze1man/radius v0.0.0-20190516032554-afd8baec892d
 	github.com/free5gc/openapi v1.2.4
 	github.com/free5gc/util v1.3.2
@@ -24,6 +24,7 @@ require (
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
+	github.com/free5gc/ausf v1.4.5 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect

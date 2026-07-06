@@ -1,12 +1,16 @@
 package main
 
 import (
+	"context"
 	"os"
+	"os/signal"
 	"runtime/debug"
+	"syscall"
 
 	"github.com/urfave/cli/v2"
 
 	"github.com/fre5gc/dnf/internal/logger"
+	"github.com/free5gc/dnf/pkg/factory"
 	"github.com/free5gc/util/version"
 )
 
@@ -23,6 +27,11 @@ func main() {
 	app.Usage = "5G Dummy Network Function (DNF)"
 	app.Action = action
 	app.Flags = []cli.Flag{
+		&cli.StringFlag{
+			Name:    "config",
+			Aliases: []string{"c"},
+			Usage:   "Load configuration from `FILE`",
+		},
 		&cli.StringSliceFlag{
 			Name:    "log",
 			Aliases: []string{"l"},
@@ -37,5 +46,21 @@ func main() {
 
 func action(cliCtx *cli.Context) error {
 	logger.MainLog.Infoln("DNF version: ", version.GetVersion())
+
+	ctx, cancel := context.WithCancel(context.Background())
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		<-sigCh
+		cancel()
+	}()
+
+	cfg, err := factory.ReadConfig(cliCtx.String("config"))
+	if err != nil {
+		sigCh <- nil
+		return err
+	}
+
 	return nil
 }
