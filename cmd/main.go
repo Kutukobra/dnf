@@ -11,8 +11,11 @@ import (
 
 	"github.com/free5gc/dnf/internal/logger"
 	"github.com/free5gc/dnf/pkg/factory"
+	"github.com/free5gc/dnf/pkg/service"
 	"github.com/free5gc/util/version"
 )
+
+var DNF *service.DnfApp
 
 func main() {
 	defer func() {
@@ -63,7 +66,15 @@ func action(cliCtx *cli.Context) error {
 	}
 	factory.DnfConfig = cfg
 
-	logger.CfgLog.Info(cfg)
-	logger.CfgLog.Info(ctx)
+	dnf, err := service.NewApp(ctx, cfg)
+	if err != nil {
+		sigCh <- nil
+		return err
+	}
+
+	DNF = dnf
+
+	dnf.Start()
+
 	return nil
 }
