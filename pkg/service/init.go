@@ -13,10 +13,13 @@ import (
 	"github.com/free5gc/dnf/internal/sbi"
 	"github.com/free5gc/dnf/internal/sbi/consumer"
 	"github.com/free5gc/dnf/internal/sbi/processor"
+	"github.com/free5gc/dnf/pkg/app"
 	"github.com/free5gc/dnf/pkg/factory"
 )
 
 var DNF *DnfApp
+
+var _ app.App = &DnfApp{}
 
 type DnfApp struct {
 	dnfCtx *dnf_context.DnfContext
@@ -65,8 +68,12 @@ func NewApp(ctx context.Context, cfg *factory.Config) (*DnfApp, error) {
 	return dnf, nil
 }
 
-func (a *DnfApp) Start() {
-	logger.InitLog.Infoln("Server started")
+func (a *DnfApp) Context() *dnf_context.DnfContext {
+	return a.dnfCtx
+}
+
+func (a *DnfApp) Config() *factory.Config {
+	return a.cfg
 }
 
 func (a *DnfApp) CancelContext() context.Context {
@@ -79,14 +86,6 @@ func (a *DnfApp) Consumer() *consumer.Consumer {
 
 func (a *DnfApp) Processor() *processor.Processor {
 	return a.processor
-}
-
-func (a *DnfApp) Context() *dnf_context.DnfContext {
-	return a.dnfCtx
-}
-
-func (a *DnfApp) Config() *factory.Config {
-	return a.cfg
 }
 
 func (a *DnfApp) SetLogEnable(enable bool) {
@@ -129,4 +128,12 @@ func (a *DnfApp) SetReportCaller(reportCaller bool) {
 
 	a.Config().SetLogReportCaller(reportCaller)
 	logger.Log.SetReportCaller(reportCaller)
+}
+
+func (a *DnfApp) Start() {
+	logger.InitLog.Infoln("Server started")
+}
+
+func (a *DnfApp) Terminate() {
+	a.cancel()
 }
