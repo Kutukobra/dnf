@@ -8,6 +8,8 @@ type ConsumerDnf interface {
 
 type Consumer struct {
 	ConsumerDnf
+
+	*nnrfService
 }
 
 func NewConsumer(dnf ConsumerDnf) (*Consumer, error) {

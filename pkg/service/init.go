@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"os"
+	"runtime/debug"
 	"sync"
 
 	"github.com/sirupsen/logrus"
@@ -132,8 +133,54 @@ func (a *DnfApp) SetReportCaller(reportCaller bool) {
 
 func (a *DnfApp) Start() {
 	logger.InitLog.Infoln("Server started")
+
+	a.wg.Add(1)
+	go a.listenShutdownEvent()
+
+	if err := a.sbiServer.Run(context.Background(), &a.wg); err != nil {
+		logger.MainLog.Fatalf("Run SBI server failed: %+v", err)
+	}
+
+	a.WaitRoutineStopped()
+}
+
+func (a *DnfApp) listenShutdownEvent() {
+	defer func() {
+		if p := recover(); p != nil {
+			logger.MainLog.Fatalf("panic: %v\n%s", p, string(debug.Stack()))
+		}
+		a.wg.Done()
+	}()
+
+	<-a.ctx.Done()
+	a.terminateProcedure()
 }
 
 func (a *DnfApp) Terminate() {
 	a.cancel()
+}
+
+func (a *DnfApp) terminateProcedure() {
+	logger.MainLog.Infof("Terminating DNF...")
+	a.CallServerStop()
+
+	// deregister with NRF
+	problemDetails, err := a.Consumer().SendDeregisterNFInstance()
+	if problemDetails != nil {
+		logger.MainLog.Errorf("Deregister NF instance Failed Problem[%+v]", problemDetails)
+	} else if err != nil {
+		logger.MainLog.Errorf("Deregister NF instance Error[%+v]", err)
+	} else {
+		logger.MainLog.Infof("Deregister from NRF successfully")
+	}
+	logger.MainLog.Infof("CHF SBI Server terminated")
+}
+
+func (a *DnfApp) CallServerStop() {
+
+}
+
+func (a *DnfApp) WaitRoutineStopped() {
+	a.wg.Wait()
+	logger.MainLog.Infof("DNF App is terminated")
 }
