@@ -1,4 +1,4 @@
-module github.com/fre5gc/dnf
+module github.com/free5gc/dnf
 
 go 1.26.2
 

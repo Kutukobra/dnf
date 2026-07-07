@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/fre5gc/dnf/internal/logger"
+	"github.com/free5gc/dnf/internal/logger"
 	"gopkg.in/yaml.v3"
 )
 
@@ -17,7 +17,7 @@ func InitConfigFactory(f string, cfg *Config) error {
 	}
 
 	if content, err := os.ReadFile(f); err != nil {
-		return fmt.Errorf("[Factory] %+v")
+		return fmt.Errorf("[Factory] %+v", err)
 	} else {
 		logger.CfgLog.Infof("Read config from [%s]", f)
 		if yamlErr := yaml.Unmarshal(content, cfg); yamlErr != nil {
