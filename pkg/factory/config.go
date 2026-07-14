@@ -17,6 +17,7 @@ const (
 	DnfSbiDefaultPort    = 8000
 	DnfSbiDefaultScheme  = "https"
 	DnfDefaultNrfUri     = "https://127.0.0.10:8000"
+	DnfDummyUriPrefix    = "/dnf-dummy/v1"
 )
 
 type Config struct {
@@ -47,10 +48,11 @@ type Info struct {
 }
 
 type Configuration struct {
-	NfInstanceId string `yaml:"nfInstanceId,omitempty" valid:"optional,uuidv4"`
-	Sbi          *Sbi   `yaml:"sbi,omitempty" valid:"required"`
-	NrfUri       string `yaml:"nrfUri,omitempty" valid:"url,required"`
-	GroupId      string `yaml:"groupId,omitempty" valid:"type(string),minstringlength(1)"`
+	NfInstanceId    string   `yaml:"nfInstanceId,omitempty" valid:"optional,uuidv4"`
+	Sbi             *Sbi     `yaml:"sbi,omitempty" valid:"required"`
+	ServiceNameList []string `yaml:"serviceNameList,omitempty" valid:"required"`
+	NrfUri          string   `yaml:"nrfUri,omitempty" valid:"url,required"`
+	GroupId         string   `yaml:"groupId,omitempty" valid:"type(string),minstringlength(1)"`
 }
 
 func (c *Configuration) validate() (bool, error) {

@@ -1,8 +1,10 @@
 package sbi
 
 import (
+	"context"
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -11,8 +13,15 @@ import (
 	"github.com/free5gc/dnf/internal/sbi/consumer"
 	"github.com/free5gc/dnf/internal/sbi/processor"
 	"github.com/free5gc/dnf/pkg/app"
+	"github.com/free5gc/dnf/pkg/factory"
 	"github.com/free5gc/util/httpwrapper"
 	logger_util "github.com/free5gc/util/logger"
+)
+
+type ServiceName string
+
+const (
+	ServiceName_NDNF_DUMMY ServiceName = "ndnf-dummy"
 )
 
 type ServerDnf interface {
@@ -52,5 +61,22 @@ func NewServer(dnf ServerDnf) (*Server, error) {
 func newRouter(s *Server) *gin.Engine {
 	router := logger_util.NewGinWithLogrus(logger.GinLog)
 
+	for _, serviceName := range factory.DnfConfig.Configuration.ServiceNameList {
+		switch ServiceName(serviceName) {
+		case ServiceName_NDNF_DUMMY:
+			dnfDummyGroup := router.Group(factory.DnfDummyUriPrefix)
+			dnfDummyRoutes := s.getDummyRoutes()
+			applyRoutes(dnfDummyGroup, dnfDummyRoutes)
+
+		default:
+			logger.SBILog.Warnf("Unsupported service name: %s", serviceName)
+		}
+	}
+
 	return router
+}
+
+func (s *Server) Run(traceCtx context.Context, wg *sync.WaitGroup) error {
+
+	return nil
 }

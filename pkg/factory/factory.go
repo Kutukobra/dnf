@@ -29,7 +29,7 @@ func InitConfigFactory(f string, cfg *Config) error {
 }
 
 func ReadConfig(cfgPath string) (*Config, error) {
-	cfg := &Config{}config
+	cfg := &Config{}
 	if err := InitConfigFactory(cfgPath, cfg); err != nil {
 		return nil, fmt.Errorf("ReadConfig [%s] Error: %+v", cfgPath, err)
 	}
