@@ -30,6 +30,8 @@ func InitDnfContext(context *DNFContext) {
 
 	configuration := config.Configuration
 	sbi := configuration.Sbi
+
+	context.NfId = config.GetNfInstanceId()
 }
 
 func GetSelf() *DNFContext {
