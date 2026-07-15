@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"runtime/debug"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -77,6 +78,43 @@ func newRouter(s *Server) *gin.Engine {
 }
 
 func (s *Server) Run(traceCtx context.Context, wg *sync.WaitGroup) error {
+	var err error
+	_, s.Context().NfId, err = s.Consumer().RegisterNFInstance(context.Background())
+	if err != nil {
+		logger.InitLog.Errorf("DNF register to NRF Error[%s]", err.Error())
+	}
+
+	wg.Add(1)
+	go s.startServer(wg)
 
 	return nil
+}
+
+func (s *Server) Shutdown() {
+	s.shutdownHttpServer()
+}
+
+func (s *Server) shutdownHttpServer() {
+
+}
+
+func (s *Server) startServer(wg *sync.WaitGroup) {
+	defer func() {
+		if p := recover(); p != nil {
+			// Print stack for panic to log. Fatalf() will let program exit.
+			logger.SBILog.Fatalf("panic: %v\n%s", p, string(debug.Stack()))
+			s.Terminate()
+		}
+		wg.Done()
+	}()
+
+	logger.SBILog.Infof("Start SBI server (listen on %s)", s.httpServer.Addr)
+
+	var err error
+	err = s.httpServer.ListenAndServe()
+
+	if err != nil && err != http.ErrServerClosed {
+		logger.SBILog.Errorf("SBI server error: %v", err)
+	}
+	logger.SBILog.Infof("SBI server (listen on %s) stopped", s.httpServer.Addr)
 }

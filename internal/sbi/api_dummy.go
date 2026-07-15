@@ -12,9 +12,11 @@ func (s *Server) getDummyRoutes() []Route {
 			Name:    "Index",
 			Method:  http.MethodGet,
 			Pattern: "/",
-			APIFunc: func(c *gin.Context) {
-				c.String(http.StatusOK, "Hello DNF!")
-			},
+			APIFunc: s.HTTPDummyMessage,
 		},
 	}
+}
+
+func (s *Server) HTTPDummyMessage(c *gin.Context) {
+	c.String(http.StatusOK, "Hello DNF!")
 }
