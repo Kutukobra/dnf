@@ -23,7 +23,7 @@ var DNF *DnfApp
 var _ app.App = &DnfApp{}
 
 type DnfApp struct {
-	dnfCtx *dnf_context.DnfContext
+	dnfCtx *dnf_context.DNFContext
 	cfg    *factory.Config
 
 	ctx    context.Context
@@ -69,7 +69,7 @@ func NewApp(ctx context.Context, cfg *factory.Config) (*DnfApp, error) {
 	return dnf, nil
 }
 
-func (a *DnfApp) Context() *dnf_context.DnfContext {
+func (a *DnfApp) Context() *dnf_context.DNFContext {
 	return a.dnfCtx
 }
 

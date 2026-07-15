@@ -13,6 +13,6 @@ type App interface {
 	Start()
 	Terminate()
 
-	Context() *dnf_context.DnfContext
+	Context() *dnf_context.DNFContext
 	Config() *factory.Config
 }

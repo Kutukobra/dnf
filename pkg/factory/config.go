@@ -12,12 +12,13 @@ import (
 )
 
 const (
-	DnfDefaultConfigPath = "./NFs/dnf/dnfcfg.yaml"
-	DnfSbiDefaultIPv4    = "127.0.0.101"
-	DnfSbiDefaultPort    = 8000
-	DnfSbiDefaultScheme  = "https"
-	DnfDefaultNrfUri     = "https://127.0.0.10:8000"
-	DnfDummyUriPrefix    = "/dnf-dummy/v1"
+	DnfDefaultConfigPath         = "./NFs/dnf/dnfcfg.yaml"
+	DnfDefaultNfInstanceIdEnvVar = "DNF_NF_INSTANCE_ID"
+	DnfSbiDefaultIPv4            = "127.0.0.101"
+	DnfSbiDefaultPort            = 8000
+	DnfSbiDefaultScheme          = "https"
+	DnfDefaultNrfUri             = "https://127.0.0.10:8000"
+	DnfDummyUriPrefix            = "/dnf-dummy/v1"
 )
 
 type Config struct {
@@ -68,6 +69,29 @@ func (c *Configuration) validate() (bool, error) {
 
 	result, err := govalidator.ValidateStruct(c)
 	return result, appendInvalid(err)
+}
+
+func (c *Config) GetNfInstanceId() string {
+	c.RLock()
+	defer c.RUnlock()
+
+	var nfInstanceId string
+
+	logger.CfgLog.Debugf("Fetching nfInstanceId from env var \"%s\"", DnfDefaultNfInstanceIdEnvVar)
+
+	if nfInstanceId = os.Getenv(DnfDefaultNfInstanceIdEnvVar); nfInstanceId == "" {
+		logger.CfgLog.Debugf("No value found for \"%s\" env, fallback on config nfInstanceId : %s", DnfDefaultNfInstanceIdEnvVar, c.Configuration.NfInstanceId)
+		return c.Configuration.NfInstanceId
+	}
+
+	if err := uuid.Validate(nfInstanceId); err != nil {
+		logger.CfgLog.Errorf("Env var \"%s\" is ot a valid uuid, fallback on configuration nfInstanceId : %s", DnfDefaultNfInstanceIdEnvVar, c.Configuration.NfInstanceId)
+		return c.Configuration.NfInstanceId
+	}
+
+	logger.CfgLog.Debug("nfInstanceId from %s : %s", DnfDefaultNfInstanceIdEnvVar, nfInstanceId)
+
+	return nfInstanceId
 }
 
 type Logger struct {
