@@ -61,6 +61,12 @@ type Configuration struct {
 	GroupId         string   `yaml:"groupId,omitempty" valid:"type(string),minstringlength(1)"`
 }
 
+type Logger struct {
+	Enable       bool   `yaml:"enable" valid:"type(bool)"`
+	Level        string `yaml:"level" valid:"required,in(trace|debug|info|warn|error|fatal|panic)"`
+	ReportCaller bool   `yaml:"reportCaller" valid:"type(bool)"`
+}
+
 func (c *Configuration) validate() (bool, error) {
 	if c.NfInstanceId == "" {
 		c.NfInstanceId = uuid.New().String()
@@ -94,15 +100,9 @@ func (c *Config) GetNfInstanceId() string {
 		return c.Configuration.NfInstanceId
 	}
 
-	logger.CfgLog.Debug("nfInstanceId from %s : %s", DnfDefaultNfInstanceIdEnvVar, nfInstanceId)
+	logger.CfgLog.Debugf("nfInstanceId from %s : %s", DnfDefaultNfInstanceIdEnvVar, nfInstanceId)
 
 	return nfInstanceId
-}
-
-type Logger struct {
-	Enable       bool   `yaml:"enable" valid:"type(bool)"`
-	Level        string `yaml:"level" valid:"required,in(trace|debug|info|warn|error|fatal|panic)"`
-	ReportCaller bool   `yaml:"reportCaller" valid:"type(bool)"`
 }
 
 type Sbi struct {
