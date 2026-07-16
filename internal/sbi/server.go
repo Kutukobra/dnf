@@ -104,7 +104,7 @@ func (s *Server) startServer(wg *sync.WaitGroup) {
 		wg.Done()
 	}()
 
-	logger.SBILog.Infof("Start SBI server (listen on %s)", s.httpServer.Addr)
+	logger.SBILog.Infof("SBI server started (listen on %s)", s.httpServer.Addr)
 
 	var err error
 	err = s.httpServer.ListenAndServe()

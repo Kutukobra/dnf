@@ -15,15 +15,16 @@ const (
 )
 
 type DNFContext struct {
-	NfId         string
-	SBIPort      int
-	RegisterIPv4 string
-	BindingIPv4  string
-	Url          string
-	UriScheme    models.UriScheme
-	NrfUri       string
-	NrfCertPem   string
-	NfService    map[models.ServiceName]models.NrfNfManagementNfService
+	NfId           string
+	SBIPort        int
+	RegisterIPv4   string
+	BindingIPv4    string
+	Url            string
+	UriScheme      models.UriScheme
+	NrfUri         string
+	NrfCertPem     string
+	NfService      map[models.ServiceName]models.NrfNfManagementNfService
+	OAuth2Required bool
 }
 
 var dnfContext DNFContext
