@@ -49,7 +49,25 @@ func (s *nnrfService) getNFManagementClient(uri string) *Nnrf_NFManagement.APICl
 
 func (s *nnrfService) SendDeregisterNFInstance() (*models.ProblemDetails, error) {
 	logger.ConsumerLog.Infof("[DNF] Send Deregister NFInstance")
-	return nil, nil
+
+	ctx, problemDetail, err := dnf_context.GetSelf().GetTokenCtx(models.ServiceName_NNRF_NFM, models.NrfNfManagementNfType_NRF)
+	if err != nil {
+		return problemDetail, err
+	}
+
+	dnfContext := s.consumer.Context()
+	client := s.getNFManagementClient(dnfContext.NrfUri)
+	deregisterNFInstanceRequest := &Nnrf_NFManagement.DeregisterNFInstanceRequest{
+		NfInstanceID: &dnfContext.NfId,
+	}
+
+	_, err = client.NFInstanceIDDocumentApi.DeregisterNFInstance(ctx, deregisterNFInstanceRequest)
+	if apiErr, ok := err.(openapi.GenericOpenAPIError); ok {
+		if deregNfError, ok := apiErr.Model().(Nnrf_NFManagement.DeregisterNFInstanceError); ok {
+			return &deregNfError.ProblemDetails, err
+		}
+	}
+	return nil, err
 }
 
 func (s *nnrfService) RegisterNFInstance(ctx context.Context) (
@@ -80,9 +98,9 @@ func (s *nnrfService) RegisterNFInstance(ctx context.Context) (
 		res, err = client.NFInstanceIDDocumentApi.RegisterNFInstance(ctx, registerNFInstanceRequest)
 		if err != nil || res == nil {
 			logger.ConsumerLog.Errorf("DNF register to NRF Error[%v]", err)
-			if errorResponse, ok := err.(openapi.GenericOpenAPIError); ok {
-				if apiError, ok := errorResponse.Model().(Nnrf_NFManagement.RegisterNFInstanceError); ok {
-					logger.ConsumerLog.Errorf("%v", apiError.ProblemDetails.Detail)
+			if apiErr, ok := err.(openapi.GenericOpenAPIError); ok {
+				if regErr, ok := apiErr.Model().(Nnrf_NFManagement.RegisterNFInstanceError); ok {
+					logger.ConsumerLog.Errorf("%v", regErr.ProblemDetails.Detail)
 				}
 			}
 			time.Sleep(2 * time.Second)

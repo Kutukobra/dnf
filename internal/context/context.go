@@ -1,6 +1,7 @@
 package context
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strconv"
@@ -8,6 +9,7 @@ import (
 	"github.com/free5gc/dnf/internal/logger"
 	"github.com/free5gc/dnf/pkg/factory"
 	"github.com/free5gc/openapi/models"
+	"github.com/free5gc/openapi/oauth"
 )
 
 const (
@@ -112,4 +114,17 @@ func AddNfServices(
 
 func GetSelf() *DNFContext {
 	return &dnfContext
+}
+
+func (c *DNFContext) GetSelfID() string {
+	return c.NfId
+}
+
+func (c *DNFContext) GetTokenCtx(serviceName models.ServiceName, targetNF models.NrfNfManagementNfType) (
+	context.Context, *models.ProblemDetails, error,
+) {
+	if !c.OAuth2Required {
+		return context.TODO(), nil, nil
+	}
+	return oauth.GetTokenCtx(models.NrfNfManagementNfType_AF, targetNF, c.NfId, c.NrfUri, string(serviceName))
 }
