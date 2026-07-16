@@ -173,7 +173,7 @@ func (a *DnfApp) terminateProcedure() {
 	} else {
 		logger.MainLog.Infof("Deregister from NRF successfully")
 	}
-	logger.MainLog.Infof("CHF SBI Server terminated")
+	logger.MainLog.Infof("DNF SBI Server terminated")
 }
 
 func (a *DnfApp) CallServerStop() {

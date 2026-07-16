@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"runtime/debug"
 	"sync"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -91,7 +92,11 @@ func (s *Server) Shutdown() {
 }
 
 func (s *Server) shutdownHttpServer() {
+	const defaultShutdownTimeout time.Duration = 2 * time.Second
 
+	if s.httpServer != nil {
+		logger.SBILog.Infof("Stop SBI server (listen on %s)", s.httpServer.Addr)
+	}
 }
 
 func (s *Server) startServer(wg *sync.WaitGroup) {
