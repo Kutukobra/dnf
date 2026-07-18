@@ -176,12 +176,13 @@ func (s *nnrfService) getNFDiscClient(uri string) *Nnrf_NFDiscovery.APIClient {
 	return client
 }
 
-func (s *nnrfService) SendSearchNFInstances(nrfUri string, targetNfType, requestNfType models.NrfNfManagementNfType,
-	param *Nnrf_NFDiscovery.SearchNFInstancesRequest,
-) (*models.SearchResult, error) {
+func (s *nnrfService) SendSearchNFInstances(nrfUri string, targetNfType, requestNfType models.NrfNfManagementNfType) (*models.SearchResult, error) {
 	// Set client and set url
-	param.TargetNfType = &targetNfType
-	param.RequesterNfType = &requestNfType
+	searchNFRequest := Nnrf_NFDiscovery.SearchNFInstancesRequest{
+		TargetNfType:    &targetNfType,
+		RequesterNfType: &requestNfType,
+	}
+
 	client := s.getNFDiscClient(nrfUri)
 	if client == nil {
 		return nil, openapi.ReportError("nrf not found")
@@ -191,13 +192,14 @@ func (s *nnrfService) SendSearchNFInstances(nrfUri string, targetNfType, request
 	if err != nil {
 		return nil, err
 	}
-	res, err := client.NFInstancesStoreApi.SearchNFInstances(ctx, param)
+	res, err := client.NFInstancesStoreApi.SearchNFInstances(ctx, &searchNFRequest)
 	var result *models.SearchResult
 	if err != nil {
 		logger.ConsumerLog.Errorf("SearchNFInstances failed: %+v", err)
 	}
 	if res != nil {
 		result = &res.SearchResult
+		logger.ConsumerLog.Infof("Found NF Instance: %v", result.NfInstances[0].NfInstanceId)
 	}
 	return result, err
 }
