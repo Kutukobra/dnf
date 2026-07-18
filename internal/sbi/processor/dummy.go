@@ -18,7 +18,6 @@ func (p *Processor) HandleDummyProcess(c *gin.Context) {
 func (p *Processor) DummyProcess(c *gin.Context) {
 	dnfContext := dnf_context.GetSelf()
 	nrfUri := dnfContext.NrfUri
-	udmUri := dnfContext.UdmUri
 
 	// Discover Itself (whuh)
 
@@ -33,5 +32,15 @@ func (p *Processor) DummyProcess(c *gin.Context) {
 	}
 
 	// Finds NSSAI from dnfconfig.yaml
+	nssai, err := p.Consumer().GetNSSAI(dnfContext.SearchSupi, dnfContext.SearchMCC, dnfContext.SearchMNC)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+	}
 	// Return as JSON
+	c.JSON(http.StatusOK, gin.H{
+		"searchResult": searchResult,
+		"nssai":        nssai,
+	})
 }

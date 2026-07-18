@@ -59,6 +59,9 @@ type Configuration struct {
 	NrfUri          string   `yaml:"nrfUri,omitempty" valid:"url,required"`
 	NrfCertPem      string   `yaml:"nrfCertPem,omitempty" valid:"optional"`
 	GroupId         string   `yaml:"groupId,omitempty" valid:"type(string),minstringlength(1)"`
+	SearchSupi      string   `yaml:"searchSupi,omitempty" valid:"type(string),minstringlength(1)"`
+	SearchMCC       string   `yaml:"searchMCC,omitempty" valid:"type(string),minstringlength(1)"`
+	SearchMNC       string   `yaml:"searchMNC,omitempty" valid:"type(string),minstringlength(1)"`
 }
 
 type Logger struct {

@@ -27,6 +27,9 @@ type DNFContext struct {
 	UdmUri         string
 	NrfCertPem     string
 	NfService      map[models.ServiceName]models.NrfNfManagementNfService
+	SearchSupi     string
+	SearchMCC      string
+	SearchMNC      string
 	OAuth2Required bool
 }
 
@@ -50,6 +53,9 @@ func InitDnfContext(context *DNFContext) {
 	context.UriScheme = models.UriScheme(configuration.Sbi.Scheme)
 	context.RegisterIPv4 = factory.DnfSbiDefaultIPv4
 	context.SBIPort = factory.DnfSbiDefaultPort
+	context.SearchSupi = configuration.SearchSupi
+	context.SearchMNC = configuration.SearchMCC
+	context.SearchMCC = configuration.SearchMNC
 	if sbi != nil {
 		if sbi.RegisterIPv4 != "" {
 			context.RegisterIPv4 = sbi.RegisterIPv4
