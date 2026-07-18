@@ -71,7 +71,7 @@ func (s *nudmService) GetNSSAI(supi string, mcc string, mnc string) (
 				err = openapi.ReportError("openapi error")
 			}
 		} else {
-			return "", openapi.ReportError("openapi error")
+			return models.Snssai{}, openapi.ReportError("openapi error")
 		}
 	}
 
