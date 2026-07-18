@@ -153,3 +153,51 @@ func (s *nnrfService) buildNfProfile(dnfContext *dnf_context.DNFContext) (
 
 	return profile, nil
 }
+
+func (s *nnrfService) getNFDiscClient(uri string) *Nnrf_NFDiscovery.APIClient {
+	if uri == "" {
+		return nil
+	}
+	s.nfDiscMu.RLock()
+	client, ok := s.nfDiscClients[uri]
+	if ok {
+		s.nfDiscMu.RUnlock()
+		return client
+	}
+
+	configuration := Nnrf_NFDiscovery.NewConfiguration()
+	configuration.SetBasePath(uri)
+	client = Nnrf_NFDiscovery.NewAPIClient(configuration)
+
+	s.nfDiscMu.RUnlock()
+	s.nfDiscMu.Lock()
+	defer s.nfDiscMu.Unlock()
+	s.nfDiscClients[uri] = client
+	return client
+}
+
+func (s *nnrfService) SendSearchNFInstances(nrfUri string, targetNfType, requestNfType models.NrfNfManagementNfType,
+	param *Nnrf_NFDiscovery.SearchNFInstancesRequest,
+) (*models.SearchResult, error) {
+	// Set client and set url
+	param.TargetNfType = &targetNfType
+	param.RequesterNfType = &requestNfType
+	client := s.getNFDiscClient(nrfUri)
+	if client == nil {
+		return nil, openapi.ReportError("nrf not found")
+	}
+
+	ctx, _, err := dnf_context.GetSelf().GetTokenCtx(models.ServiceName_NNRF_DISC, models.NrfNfManagementNfType_NRF)
+	if err != nil {
+		return nil, err
+	}
+	res, err := client.NFInstancesStoreApi.SearchNFInstances(ctx, param)
+	var result *models.SearchResult
+	if err != nil {
+		logger.ConsumerLog.Errorf("SearchNFInstances failed: %+v", err)
+	}
+	if res != nil {
+		result = &res.SearchResult
+	}
+	return result, err
+}
