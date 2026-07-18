@@ -106,8 +106,8 @@ func (s *nnrfService) RegisterNFInstance(ctx context.Context) (
 			time.Sleep(2 * time.Second)
 			continue
 		}
-		nf = res.NrfNfManagementNfProfile
 
+		nf = res.NrfNfManagementNfProfile
 		if res.Location == "" {
 			break
 		} else {

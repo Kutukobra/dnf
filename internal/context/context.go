@@ -24,6 +24,7 @@ type DNFContext struct {
 	Url            string
 	UriScheme      models.UriScheme
 	NrfUri         string
+	UdmUri         string
 	NrfCertPem     string
 	NfService      map[models.ServiceName]models.NrfNfManagementNfService
 	OAuth2Required bool
