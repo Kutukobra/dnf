@@ -15,6 +15,7 @@ var (
 	SBILog      *logrus.Entry
 	GinLog      *logrus.Entry
 	ConsumerLog *logrus.Entry
+	DummyLog    *logrus.Entry
 	UtilLog     *logrus.Entry
 )
 
@@ -33,5 +34,6 @@ func init() {
 	SBILog = NfLog.WithField(logger_util.FieldCategory, "SBI")
 	GinLog = NfLog.WithField(logger_util.FieldCategory, "GIN")
 	ConsumerLog = NfLog.WithField(logger_util.FieldCategory, "Consumer")
+	DummyLog = NfLog.WithField(logger_util.FieldCategory, "DMService")
 	UtilLog = NfLog.WithField(logger_util.FieldCategory, "Util")
 }

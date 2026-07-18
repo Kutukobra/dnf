@@ -14,9 +14,19 @@ func (s *Server) getDummyRoutes() []Route {
 			Pattern: "/",
 			APIFunc: s.HTTPDummyMessage,
 		},
+		{
+			Name:    "Dummy Process",
+			Method:  http.MethodGet,
+			Pattern: "/dummy",
+			APIFunc: s.HTTPDummyProcess,
+		},
 	}
 }
 
 func (s *Server) HTTPDummyMessage(c *gin.Context) {
 	c.String(http.StatusOK, "Hello DNF!")
+}
+
+func (s *Server) HTTPDummyProcess(c *gin.Context) {
+	s.Processor().HandleDummyProcess(c)
 }

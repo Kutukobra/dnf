@@ -176,7 +176,9 @@ func (s *nnrfService) getNFDiscClient(uri string) *Nnrf_NFDiscovery.APIClient {
 	return client
 }
 
-func (s *nnrfService) SendSearchNFInstances(nrfUri string, targetNfType, requestNfType models.NrfNfManagementNfType) (*models.SearchResult, error) {
+func (s *nnrfService) SendSearchNFInstances(nrfUri string, targetNfType, requestNfType models.NrfNfManagementNfType) (
+	*models.SearchResult, error,
+) {
 	// Set client and set url
 	searchNFRequest := Nnrf_NFDiscovery.SearchNFInstancesRequest{
 		TargetNfType:    &targetNfType,
