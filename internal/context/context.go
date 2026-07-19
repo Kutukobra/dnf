@@ -50,6 +50,7 @@ func InitDnfContext(context *DNFContext) {
 	// Defaults
 	context.NrfUri = configuration.NrfUri
 	context.NrfCertPem = configuration.NrfCertPem
+	context.UdmUri = configuration.UdmUri
 	context.UriScheme = models.UriScheme(configuration.Sbi.Scheme)
 	context.RegisterIPv4 = factory.DnfSbiDefaultIPv4
 	context.SBIPort = factory.DnfSbiDefaultPort

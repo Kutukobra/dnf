@@ -46,6 +46,11 @@ func (s *nudmService) GetNSSAI(supi string, mcc string, mnc string) (
 ) {
 	dnfContext := s.consumer.Context()
 	client := s.getSubscriberDMngmntClients(dnfContext.UdmUri)
+	if client == nil {
+		return models.Snssai{}, openapi.ReportError("udm not found")
+	}
+
+	logger.ConsumerLog.Infof("Fetching NSSAI of SUPI: %v, MCC: %v, MNC: %v", supi, mcc, mnc)
 
 	getNSSAIRequest := Nudm_SDM.GetNSSAIRequest{
 		Supi: &supi,
@@ -59,6 +64,7 @@ func (s *nudmService) GetNSSAI(supi string, mcc string, mnc string) (
 	if err != nil {
 		if problemDetails != nil {
 			logger.ConsumerLog.Errorf("GetNSSAI Error: %v", problemDetails.Detail)
+			return models.Snssai{}, err
 		}
 	}
 	res, err := client.SliceSelectionSubscriptionDataRetrievalApi.GetNSSAI(ctx, &getNSSAIRequest)
@@ -66,17 +72,27 @@ func (s *nudmService) GetNSSAI(supi string, mcc string, mnc string) (
 	if err != nil {
 		if apiErr, ok := err.(openapi.GenericOpenAPIError); ok {
 			if errModel, ok := apiErr.Model().(Nudm_SDM.GetNSSAIError); ok {
-				logger.ConsumerLog.Errorf("GetNSSAI Error: %v", errModel.ProblemDetails.Detail)
+				logger.ConsumerLog.Errorf("GetNSSAI Error: %v", errModel.ProblemDetails)
 			} else {
 				err = openapi.ReportError("openapi error")
 			}
 		} else {
 			return models.Snssai{}, openapi.ReportError("openapi error")
 		}
+		return models.Snssai{}, err
 	}
 
-	snssai := res.Nssai.SingleNssais[0]
-	logger.ConsumerLog.Infof("NSSAI of %s: %v", supi, snssai)
+	var snssai models.Snssai
 
+	if len(res.Nssai.SingleNssais) > 0 {
+		snssai = res.Nssai.SingleNssais[0]
+	} else {
+		snssai = models.Snssai{
+			Sst: 6969,
+			Sd:  "69",
+		}
+	}
+
+	logger.ConsumerLog.Infof("NSSAI of %s: %v", supi, snssai)
 	return snssai, err
 }

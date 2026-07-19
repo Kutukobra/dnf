@@ -158,11 +158,22 @@ func (s *nnrfService) getNFDiscClient(uri string) *Nnrf_NFDiscovery.APIClient {
 	if uri == "" {
 		return nil
 	}
+	if s.nfDiscClients == nil {
+		s.nfDiscMu.Lock()
+		defer s.nfDiscMu.Unlock()
+		if s.nfDiscClients == nil {
+			s.nfDiscClients = make(map[string]*Nnrf_NFDiscovery.APIClient)
+		}
+	}
 	s.nfDiscMu.RLock()
 	client, ok := s.nfDiscClients[uri]
 	if ok {
 		s.nfDiscMu.RUnlock()
 		return client
+	}
+	if s.nfDiscClients == nil {
+		s.nfDiscMu.RUnlock()
+		return nil
 	}
 
 	configuration := Nnrf_NFDiscovery.NewConfiguration()

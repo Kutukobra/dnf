@@ -22,6 +22,7 @@ const (
 	DnfSbiDefaultPort            = 8000
 	DnfSbiDefaultScheme          = "https"
 	DnfDefaultNrfUri             = "https://127.0.0.10:8000"
+	DnfDefaultUdmUri             = "https://127.0.0.3:8000"
 	DnfDummyUriPrefix            = "/dnf-dummy/v1"
 )
 
@@ -58,7 +59,7 @@ type Configuration struct {
 	ServiceNameList []string `yaml:"serviceNameList,omitempty" valid:"required"`
 	NrfUri          string   `yaml:"nrfUri,omitempty" valid:"url,required"`
 	NrfCertPem      string   `yaml:"nrfCertPem,omitempty" valid:"optional"`
-	GroupId         string   `yaml:"groupId,omitempty" valid:"type(string),minstringlength(1)"`
+	UdmUri          string   `yaml:"udmUri,omitempty" valid:"url,required"`
 	SearchSupi      string   `yaml:"searchSupi,omitempty" valid:"type(string),minstringlength(1)"`
 	SearchMCC       string   `yaml:"searchMCC,omitempty" valid:"type(string),minstringlength(1)"`
 	SearchMNC       string   `yaml:"searchMNC,omitempty" valid:"type(string),minstringlength(1)"`

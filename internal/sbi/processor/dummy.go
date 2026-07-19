@@ -37,6 +37,7 @@ func (p *Processor) DummyProcess(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
+		return
 	}
 	// Return as JSON
 	c.JSON(http.StatusOK, gin.H{
